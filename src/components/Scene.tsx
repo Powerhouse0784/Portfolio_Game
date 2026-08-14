@@ -1,0 +1,105 @@
+"use client";
+
+import { Suspense } from "react";
+import { Canvas } from "@react-three/fiber";
+import { Physics } from "@react-three/rapier";
+import { Sky, Environment } from "@react-three/drei";
+
+import CharacterController from "@/components/character/CharacterController";
+import CameraRig from "@/components/camera/CameraRig";
+import Ground from "@/components/world/terrain/Ground";
+import WorldBoundary from "@/components/world/structures/WorldBoundary";
+import BoundaryFence from "@/components/world/structures/BoundaryFence";
+import CentralPlaza from "@/components/world/terrain/CentralPlaza";
+import PathNetwork from "@/components/world/terrain/PathNetwork";
+import EntranceGate from "@/components/world/structures/EntranceGate";
+import Bridge from "@/components/world/structures/Bridge";
+import ZoneField from "@/components/world/zones/ZoneField";
+import ProjectExhibitField from "@/components/world/zones/ProjectExhibitField";
+import SkillBedField from "@/components/world/zones/SkillBedField";
+import AboutBust from "@/components/world/zones/AboutBust";
+import ExperienceHall from "@/components/world/zones/ExperienceHall";
+import ContactKiosk from "@/components/world/zones/ContactKiosk";
+import TreeField from "@/components/world/vegetation/TreeField";
+import BushField from "@/components/world/vegetation/BushField";
+import FlowerPatches from "@/components/world/vegetation/FlowerPatches";
+import RockField from "@/components/world/props/RockField";
+import PropField from "@/components/world/props/PropField";
+import Pond from "@/components/world/water/Pond";
+import NPCField from "@/components/npc/NPCField";
+import InteractionManager from "@/components/interaction/InteractionManager";
+import { useKeyboardControls } from "@/lib/hooks/useKeyboardControls";
+import { useInteractionInput } from "@/lib/hooks/useInteractionInput";
+import { useSettingsStore } from "@/lib/stores/useSettingsStore";
+import { GRAPHICS_PRESETS } from "@/lib/constants/world";
+
+function SceneContents() {
+  return (
+    <>
+      <Sky sunPosition={[100, 60, 100]} turbidity={4} rayleigh={1.2} />
+      <Environment preset="park" />
+
+      <ambientLight intensity={0.5} />
+      <directionalLight
+        castShadow
+        position={[40, 50, 20]}
+        intensity={1.4}
+        shadow-mapSize={[2048, 2048]}
+        shadow-camera-left={-60}
+        shadow-camera-right={60}
+        shadow-camera-top={60}
+        shadow-camera-bottom={-60}
+      />
+
+      <Physics gravity={[0, -9.81, 0]}>
+        <Ground />
+        <WorldBoundary />
+        <CentralPlaza />
+        <EntranceGate />
+        <Bridge />
+        <TreeField />
+        <RockField />
+        <PropField />
+        <ZoneField />
+        <ProjectExhibitField />
+        <AboutBust />
+        <ExperienceHall />
+        <ContactKiosk />
+        <NPCField />
+        <CharacterController />
+      </Physics>
+
+      {/* Visual-only world dressing — doesn't need to live inside <Physics> */}
+      <PathNetwork />
+      <BoundaryFence />
+      <BushField />
+      <FlowerPatches />
+      <Pond />
+      <SkillBedField />
+
+      <InteractionManager />
+      <CameraRig />
+    </>
+  );
+}
+
+export default function Scene() {
+  useKeyboardControls();
+  useInteractionInput();
+  const preset = useSettingsStore((s) => s.graphicsPreset);
+  const resolved = preset === "auto" ? "medium" : preset;
+  const { shadows, dpr } = GRAPHICS_PRESETS[resolved];
+
+  return (
+    <Canvas
+      shadows={shadows}
+      dpr={dpr as [number, number]}
+      camera={{ fov: 55, near: 0.1, far: 300, position: [0, 3, 14] }}
+      gl={{ antialias: true, powerPreference: "high-performance" }}
+    >
+      <Suspense fallback={null}>
+        <SceneContents />
+      </Suspense>
+    </Canvas>
+  );
+}
