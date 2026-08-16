@@ -5,6 +5,7 @@ import { useFrame } from "@react-three/fiber";
 import { RigidBody, useRapier, CapsuleCollider, RapierRigidBody } from "@react-three/rapier";
 import * as THREE from "three";
 import { usePlayerStore } from "@/lib/stores/usePlayerStore";
+import { useIntroStore } from "@/lib/stores/useIntroStore";
 import PlayerCharacter from "./PlayerCharacter";
 import { wrapAngle } from "@/lib/utils/geometry";
 
@@ -56,6 +57,11 @@ export default function CharacterController() {
     const body = rigidBody.current;
     const controller = characterController.current;
     if (!body || !controller) return;
+
+    // Freeze the character entirely while the cinematic intro plays — no input
+    // processing, no gravity step. Spawn is already resting flush on the ground,
+    // so simply not updating is enough; movement resumes the instant it ends.
+    if (useIntroStore.getState().active) return;
 
     // Clamp delta so a stalled tab doesn't launch the character across the map
     const delta = Math.min(rawDelta, 1 / 30);

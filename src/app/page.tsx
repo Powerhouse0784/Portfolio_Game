@@ -3,6 +3,9 @@
 import dynamic from "next/dynamic";
 import InteractionPrompt from "@/components/ui/hud/InteractionPrompt";
 import DiscoveryToast from "@/components/ui/hud/DiscoveryToast";
+import SkipIntroButton from "@/components/ui/hud/SkipIntroButton";
+import TouchControls from "@/components/ui/hud/TouchControls";
+import OrientationWarning from "@/components/ui/hud/OrientationWarning";
 import ActivePanel from "@/components/ui/menus/ActivePanel";
 
 // Canvas/Three.js touches `window` — must be client-only, never SSR'd.
@@ -22,6 +25,9 @@ export default function Home() {
       <DiscoveryToast />
       <InteractionPrompt />
       <ActivePanel />
+      <SkipIntroButton />
+      <TouchControls />
+      <OrientationWarning />
     </main>
   );
 }

@@ -5,6 +5,7 @@ import type { RefObject } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { usePlayerStore } from "@/lib/stores/usePlayerStore";
+import { useSettingsStore } from "@/lib/stores/useSettingsStore";
 
 // Palette ties back to the park's own brand accents (monument gold ring, gate sign)
 const SHIRT_COLOR = "#2b3a55";
@@ -29,6 +30,9 @@ type JointRef = RefObject<THREE.Group | null>;
 
 export default function PlayerCharacter() {
   const rig = useRef<THREE.Group>(null);
+  // Classic first-person convention: don't render your own body when the camera
+  // is inside your own head. Re-renders only on mode change, not per frame.
+  const cameraMode = useSettingsStore((s) => s.cameraMode);
   const hips = useRef<THREE.Group>(null);
   const leftHip = useRef<THREE.Group>(null);
   const rightHip = useRef<THREE.Group>(null);
@@ -121,7 +125,7 @@ export default function PlayerCharacter() {
   });
 
   return (
-    <group ref={rig}>
+    <group ref={rig} visible={cameraMode !== "first-person"}>
       <group ref={hips}>
         <Leg side={-1} hipRef={leftHip} kneeRef={leftKnee} />
         <Leg side={1} hipRef={rightHip} kneeRef={rightKnee} />

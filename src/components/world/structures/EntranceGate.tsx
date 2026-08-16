@@ -3,13 +3,17 @@
 import { RigidBody } from "@react-three/rapier";
 import { Text } from "@react-three/drei";
 import { ENTRANCE_Z } from "@/lib/constants/zones";
+import { useCameraCollidable } from "@/lib/hooks/useCameraCollidable";
+import type * as THREE from "three";
 
 const PILLAR_COLOR = "#5a5248";
 const GAP = 3.2; // clearance between pillars, wide enough to walk through comfortably
 
 export default function EntranceGate() {
+  const collidableRef = useCameraCollidable<THREE.Group>();
+
   return (
-    <group position={[0, 0, ENTRANCE_Z]}>
+    <group position={[0, 0, ENTRANCE_Z]} ref={collidableRef}>
       {[-1, 1].map((side) => (
         <RigidBody key={side} type="fixed" colliders="cuboid" position={[side * (GAP / 2 + 0.4), 0, 0]}>
           <mesh castShadow>

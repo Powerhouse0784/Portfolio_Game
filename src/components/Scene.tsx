@@ -3,10 +3,11 @@
 import { Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Physics } from "@react-three/rapier";
-import { Sky, Environment } from "@react-three/drei";
+import { Sky } from "@react-three/drei";
 
 import CharacterController from "@/components/character/CharacterController";
 import CameraRig from "@/components/camera/CameraRig";
+import CinematicIntro from "@/components/camera/CinematicIntro";
 import Ground from "@/components/world/terrain/Ground";
 import WorldBoundary from "@/components/world/structures/WorldBoundary";
 import BoundaryFence from "@/components/world/structures/BoundaryFence";
@@ -30,6 +31,7 @@ import NPCField from "@/components/npc/NPCField";
 import InteractionManager from "@/components/interaction/InteractionManager";
 import { useKeyboardControls } from "@/lib/hooks/useKeyboardControls";
 import { useInteractionInput } from "@/lib/hooks/useInteractionInput";
+import { useCameraModeInput } from "@/lib/hooks/useCameraModeInput";
 import { useSettingsStore } from "@/lib/stores/useSettingsStore";
 import { GRAPHICS_PRESETS } from "@/lib/constants/world";
 
@@ -37,7 +39,9 @@ function SceneContents() {
   return (
     <>
       <Sky sunPosition={[100, 60, 100]} turbidity={4} rayleigh={1.2} />
-      <Environment preset="park" />
+      {/* No <Environment> HDRI here on purpose — it fetches a lighting map from an
+          external CDN at runtime, which is a live network dependency that can (and
+          did) fail outright. Sky + the lights below already fully cover the scene. */}
 
       <ambientLight intensity={0.5} />
       <directionalLight
@@ -79,6 +83,7 @@ function SceneContents() {
 
       <InteractionManager />
       <CameraRig />
+      <CinematicIntro />
     </>
   );
 }
@@ -86,6 +91,7 @@ function SceneContents() {
 export default function Scene() {
   useKeyboardControls();
   useInteractionInput();
+  useCameraModeInput();
   const preset = useSettingsStore((s) => s.graphicsPreset);
   const resolved = preset === "auto" ? "medium" : preset;
   const { shadows, dpr } = GRAPHICS_PRESETS[resolved];

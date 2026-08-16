@@ -1,6 +1,7 @@
 "use client";
 
 import { useInteractionStore } from "@/lib/stores/useInteractionStore";
+import { useIsTouchDevice } from "@/lib/hooks/useIsTouchDevice";
 import { playUiTone } from "@/lib/audio/uiSound";
 
 export default function InteractionPrompt() {
@@ -8,6 +9,7 @@ export default function InteractionPrompt() {
   const activePanelId = useInteractionStore((s) => s.activePanelId);
   const entries = useInteractionStore((s) => s.entries);
   const openPanel = useInteractionStore((s) => s.openPanel);
+  const isTouch = useIsTouchDevice();
 
   // Distance-based visibility: nothing in range, or a panel's already open — stay hidden.
   if (!nearestId || activePanelId) return null;
@@ -23,7 +25,9 @@ export default function InteractionPrompt() {
         }}
         className="pointer-events-auto flex items-center gap-2 rounded-full border border-white/10 bg-black/70 px-4 py-2 text-white shadow-lg backdrop-blur transition-transform hover:scale-105 active:scale-95"
       >
-        <span className="flex h-6 w-6 items-center justify-center rounded-md bg-white/15 text-xs font-bold">E</span>
+        <span className="flex h-6 items-center justify-center rounded-md bg-white/15 px-2 text-xs font-bold">
+          {isTouch ? "TAP" : "E"}
+        </span>
         <span className="text-sm font-medium">{entry.title}</span>
       </button>
     </div>

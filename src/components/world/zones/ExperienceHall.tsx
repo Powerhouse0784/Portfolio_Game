@@ -4,6 +4,8 @@ import { RigidBody } from "@react-three/rapier";
 import { Billboard, Text } from "@react-three/drei";
 import Interactable from "@/components/interaction/Interactable";
 import { ZONES, ZONE_RING_RADIUS, angleToPosition } from "@/lib/constants/zones";
+import { useCameraCollidable } from "@/lib/hooks/useCameraCollidable";
+import type * as THREE from "three";
 
 const PILLAR_COLOR = "#4a4640";
 const ROOF_COLOR = "#5a5248";
@@ -12,6 +14,7 @@ const PLINTH_COLOR = "#3a3f4a";
 
 export default function ExperienceHall() {
   const zone = ZONES.find((z) => z.id === "experience");
+  const collidableRef = useCameraCollidable<THREE.Group>();
   if (!zone) return null;
 
   const center = angleToPosition(zone.angleDeg, ZONE_RING_RADIUS);
@@ -26,7 +29,7 @@ export default function ExperienceHall() {
 
   return (
     <>
-      <group>
+      <group ref={collidableRef}>
         {pillarPositions.map((pos, i) => (
           <RigidBody key={i} type="fixed" colliders="cuboid" position={pos}>
             <mesh castShadow position={[0, 1.4, 0]}>

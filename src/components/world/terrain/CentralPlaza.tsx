@@ -2,6 +2,8 @@
 
 import { RigidBody } from "@react-three/rapier";
 import { PLAZA_RADIUS } from "@/lib/constants/zones";
+import { useCameraCollidable } from "@/lib/hooks/useCameraCollidable";
+import type * as THREE from "three";
 
 const STONE_COLOR = "#a39d92";
 const STONE_RING_COLOR = "#88837a";
@@ -13,6 +15,8 @@ const STONE_RING_COLOR = "#88837a";
  * (coral / emerald / gold) used across Intense Cook.
  */
 export default function CentralPlaza() {
+  const collidableRef = useCameraCollidable<THREE.Group>();
+
   return (
     <group>
       {/* Plaza disc — visual only, Ground's collider already covers this area */}
@@ -29,22 +33,24 @@ export default function CentralPlaza() {
 
       {/* Monument, with a solid collider so it's a real obstacle, not a walk-through prop */}
       <RigidBody type="fixed" colliders="cuboid" position={[0, 0, 0]}>
-        <mesh castShadow position={[0, 0.4, 0]}>
-          <cylinderGeometry args={[1.4, 1.6, 0.8, 8]} />
-          <meshStandardMaterial color="#3a3f4a" roughness={0.7} />
-        </mesh>
-        <mesh castShadow position={[0, 1.6, 0]}>
-          <cylinderGeometry args={[0.5, 0.9, 2.4, 8]} />
-          <meshStandardMaterial color="#2b3a55" roughness={0.6} />
-        </mesh>
-        <mesh castShadow position={[0, 3.1, 0]}>
-          <torusGeometry args={[0.65, 0.1, 12, 32]} />
-          <meshStandardMaterial color="#FFB800" metalness={0.6} roughness={0.3} />
-        </mesh>
-        <mesh castShadow position={[0, 3.9, 0]}>
-          <coneGeometry args={[0.35, 0.9, 8]} />
-          <meshStandardMaterial color="#FF3D5A" roughness={0.4} />
-        </mesh>
+        <group ref={collidableRef}>
+          <mesh castShadow position={[0, 0.4, 0]}>
+            <cylinderGeometry args={[1.4, 1.6, 0.8, 8]} />
+            <meshStandardMaterial color="#3a3f4a" roughness={0.7} />
+          </mesh>
+          <mesh castShadow position={[0, 1.6, 0]}>
+            <cylinderGeometry args={[0.5, 0.9, 2.4, 8]} />
+            <meshStandardMaterial color="#2b3a55" roughness={0.6} />
+          </mesh>
+          <mesh castShadow position={[0, 3.1, 0]}>
+            <torusGeometry args={[0.65, 0.1, 12, 32]} />
+            <meshStandardMaterial color="#FFB800" metalness={0.6} roughness={0.3} />
+          </mesh>
+          <mesh castShadow position={[0, 3.9, 0]}>
+            <coneGeometry args={[0.35, 0.9, 8]} />
+            <meshStandardMaterial color="#FF3D5A" roughness={0.4} />
+          </mesh>
+        </group>
       </RigidBody>
 
       <pointLight position={[0, 4.5, 0]} intensity={8} color="#FFB800" distance={12} decay={2} />
