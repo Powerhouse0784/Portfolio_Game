@@ -6,6 +6,8 @@ import DiscoveryToast from "@/components/ui/hud/DiscoveryToast";
 import SkipIntroButton from "@/components/ui/hud/SkipIntroButton";
 import TouchControls from "@/components/ui/hud/TouchControls";
 import OrientationWarning from "@/components/ui/hud/OrientationWarning";
+import FullscreenButton from "@/components/ui/hud/FullscreenButton";
+import ControlsHint from "@/components/ui/hud/ControlsHint";
 import ActivePanel from "@/components/ui/menus/ActivePanel";
 
 // Canvas/Three.js touches `window` — must be client-only, never SSR'd.
@@ -28,6 +30,8 @@ export default function Home() {
       <SkipIntroButton />
       <TouchControls />
       <OrientationWarning />
+      <FullscreenButton />
+      <ControlsHint />
     </main>
   );
 }

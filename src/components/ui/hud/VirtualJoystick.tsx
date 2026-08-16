@@ -5,7 +5,19 @@ import { usePlayerStore } from "@/lib/stores/usePlayerStore";
 
 const BASE_SIZE = 130; // px, matches the container below
 const BASE_RADIUS = 55; // px, how far the nub can travel from center
-const DEADZONE = 0.2; // normalized (0-1) — ignores tiny accidental thumb drift
+// Raised from 0.2 and given a smooth falloff below — the old version used a hard
+// on/off threshold, so *any* nudge past ~20% of the radius instantly meant 100%
+// speed. That's exactly what made it feel twitchy. A soft deadzone means small
+// pushes now genuinely produce small, controllable movement.
+const DEADZONE = 0.22;
+
+/** Below the deadzone: 0. Above it: rescaled so the joystick can still reach a
+ *  full ±1 right at the edge, instead of the whole outer ring being wasted. */
+function applyDeadzone(value: number, deadzone: number): number {
+  const abs = Math.abs(value);
+  if (abs < deadzone) return 0;
+  return Math.sign(value) * ((abs - deadzone) / (1 - deadzone));
+}
 
 export default function VirtualJoystick() {
   const baseRef = useRef<HTMLDivElement>(null);
@@ -31,13 +43,13 @@ export default function VirtualJoystick() {
       const nx = clampedX / BASE_RADIUS;
       const ny = clampedY / BASE_RADIUS;
 
-      // Same MovementInput flags the keyboard hook sets — CharacterController
-      // doesn't know or care whether the source was a key or a thumb.
+      // Same MovementInput axes the keyboard hook sets — CharacterController
+      // doesn't know or care whether the source was a key or a thumb. Screen Y
+      // increases downward, so dragging up (forward) gives a negative ny; negate
+      // it to match moveY's convention where positive means forward.
       setInput({
-        forward: ny < -DEADZONE,
-        backward: ny > DEADZONE,
-        left: nx < -DEADZONE,
-        right: nx > DEADZONE,
+        moveX: applyDeadzone(nx, DEADZONE),
+        moveY: applyDeadzone(-ny, DEADZONE),
       });
     };
 
@@ -65,7 +77,7 @@ export default function VirtualJoystick() {
       if (!stillActive) return;
       activeTouchId.current = null;
       setNubPos({ x: 0, y: 0 });
-      setInput({ forward: false, backward: false, left: false, right: false });
+      setInput({ moveX: 0, moveY: 0 });
     };
 
     base.addEventListener("touchstart", onTouchStart, { passive: false });

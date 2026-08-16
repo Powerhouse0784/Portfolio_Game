@@ -69,23 +69,20 @@ export default function CharacterController() {
     const { input } = usePlayerStore.getState();
     const collider = body.collider(0);
 
-    // --- Car-style steering: turn keys rotate the heading directly (works standing
-    // still or moving, like a wheel), forward/back always move along that heading.
-    // Holding forward + a turn key together curves the path naturally, because the
-    // heading keeps rotating every frame while the position keeps advancing along it.
-    let turnInput = 0;
-    if (input.left) turnInput += 1;
-    if (input.right) turnInput -= 1;
+    // --- Car-style steering: turn input rotates the heading directly (works
+    // standing still or moving, like a wheel), forward/back always move along
+    // that heading. Both axes are analog now (-1..1) — keyboard always drives them
+    // to a clean ±1, but the touch joystick can drive them to any value in between,
+    // which is what gives a light thumb push a proportionally gentle turn/speed
+    // instead of snapping straight to full-speed the instant a deadzone is crossed.
+    const turnInput = THREE.MathUtils.clamp(-input.moveX, -1, 1);
     currentRotationY.current += turnInput * TURN_SPEED * delta;
     currentRotationY.current = wrapAngle(currentRotationY.current);
 
     forwardVec.current.set(Math.sin(currentRotationY.current), 0, Math.cos(currentRotationY.current));
 
-    let driveInput = 0;
-    if (input.forward) driveInput += 1;
-    if (input.backward) driveInput -= 1;
-
-    const isMoving = driveInput !== 0;
+    const driveInput = THREE.MathUtils.clamp(input.moveY, -1, 1);
+    const isMoving = Math.abs(driveInput) > 0.02;
     const isReversing = driveInput < 0;
     const speed = isReversing ? REVERSE_SPEED : input.sprint ? SPRINT_SPEED : WALK_SPEED;
 

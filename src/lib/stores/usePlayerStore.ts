@@ -1,10 +1,13 @@
 import { create } from "zustand";
 
 export type MovementInput = {
-  forward: boolean;
-  backward: boolean;
-  left: boolean;
-  right: boolean;
+  // Analog axes, both -1..1. moveY: forward(+1)/backward(-1). moveX: right(+1)/left(-1).
+  // Keyboard sets these to a clean ±1/0 (a key is either fully pressed or not), the
+  // touch joystick sets continuous values proportional to how far it's pushed —
+  // that's what gives the joystick a real analog feel instead of a twitchy on/off
+  // threshold where any small nudge instantly meant full speed.
+  moveX: number;
+  moveY: number;
   sprint: boolean;
   jump: boolean;
 };
@@ -49,10 +52,8 @@ export const usePlayerStore = create<PlayerState>((set) => ({
   turnInput: 0,
 
   input: {
-    forward: false,
-    backward: false,
-    left: false,
-    right: false,
+    moveX: 0,
+    moveY: 0,
     sprint: false,
     jump: false,
   },

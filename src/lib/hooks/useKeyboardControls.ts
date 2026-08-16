@@ -23,11 +23,13 @@ export function useKeyboardControls() {
     const pressed = new Set<string>();
 
     const recompute = () => {
+      const forward = FORWARD_KEYS.some((k) => pressed.has(k));
+      const backward = BACKWARD_KEYS.some((k) => pressed.has(k));
+      const left = LEFT_KEYS.some((k) => pressed.has(k));
+      const right = RIGHT_KEYS.some((k) => pressed.has(k));
       setInput({
-        forward: FORWARD_KEYS.some((k) => pressed.has(k)),
-        backward: BACKWARD_KEYS.some((k) => pressed.has(k)),
-        left: LEFT_KEYS.some((k) => pressed.has(k)),
-        right: RIGHT_KEYS.some((k) => pressed.has(k)),
+        moveY: (forward ? 1 : 0) - (backward ? 1 : 0),
+        moveX: (right ? 1 : 0) - (left ? 1 : 0),
         sprint: SPRINT_KEYS.some((k) => pressed.has(k)),
         jump: JUMP_KEYS.some((k) => pressed.has(k)),
       });
