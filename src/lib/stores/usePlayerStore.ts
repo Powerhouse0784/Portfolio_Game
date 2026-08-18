@@ -35,6 +35,13 @@ export type PlayerState = {
   setMoving: (moving: boolean, sprinting: boolean) => void;
   setAnimState: (verticalVelocity: number, turnInput: number) => void;
   resetPosition: () => void;
+  /** Bumped (not booleaned) so repeated presses always trigger a fresh reset even
+   *  if the previous one hasn't been "seen" yet. CharacterController watches this
+   *  and actually teleports the physics body — resetPosition() alone only updates
+   *  published state, which gets silently overwritten by the physics body's real
+   *  position on the very next frame. */
+  resetRequestId: number;
+  requestReset: () => void;
 };
 
 // Just inside the entrance gate (ENTRANCE_Z = 70), facing north into the plaza.
@@ -71,4 +78,6 @@ export const usePlayerStore = create<PlayerState>((set) => ({
   setAnimState: (verticalVelocity, turnInput) => set({ verticalVelocity, turnInput }),
 
   resetPosition: () => set({ position: SPAWN_POINT, rotationY: Math.PI }),
+  resetRequestId: 0,
+  requestReset: () => set((s) => ({ resetRequestId: s.resetRequestId + 1 })),
 }));

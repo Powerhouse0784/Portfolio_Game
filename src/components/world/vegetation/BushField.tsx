@@ -1,10 +1,12 @@
 "use client";
 
 import { useMemo, useRef, useEffect } from "react";
+import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { mulberry32 } from "@/lib/utils/geometry";
 import { WORLD_BOUNDARY_RADIUS } from "@/lib/constants/world";
 import { isSceneryExcluded } from "@/lib/world/scenery";
+import { applyWindSway } from "@/lib/materials/windSway";
 
 const CLUSTER_COUNT = 45;
 const BUSHES_PER_CLUSTER = 3;
@@ -51,6 +53,21 @@ export default function BushField() {
   const ref2 = useRef<THREE.InstancedMesh>(null);
   const refs = [ref0, ref1, ref2];
 
+  const windMaterials = useMemo(
+    () =>
+      COLORS.map((color) => {
+        const m = new THREE.MeshStandardMaterial({ color, roughness: 0.95, flatShading: true });
+        // Bushes are low and dense — a gentler, quicker rustle than the tree canopies.
+        return { mat: m, uniforms: applyWindSway(m, { strength: 0.09, speed: 1.8 }) };
+      }),
+    []
+  );
+  useFrame((state) => {
+    windMaterials.forEach(({ uniforms }) => {
+      uniforms.uTime.value = state.clock.elapsedTime;
+    });
+  });
+
   useEffect(() => {
     const dummy = new THREE.Object3D();
     refs.forEach((ref, i) => {
@@ -73,7 +90,7 @@ export default function BushField() {
       {COLORS.map((color, i) => (
         <instancedMesh key={color} ref={refs[i]} args={[undefined, undefined, byColor[i].length || 1]} castShadow receiveShadow frustumCulled={false}>
           <icosahedronGeometry args={[0.55, 1]} />
-          <meshStandardMaterial color={color} roughness={0.95} flatShading />
+          <primitive object={windMaterials[i].mat} attach="material" />
         </instancedMesh>
       ))}
     </>

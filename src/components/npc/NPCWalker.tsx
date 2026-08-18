@@ -8,16 +8,30 @@ import NPCCharacter from "./NPCCharacter";
 import type { NPCOutfit } from "@/lib/world/npcOutfits";
 import type { PatrolRoute } from "@/lib/world/npcRoutes";
 import { wrapAngle } from "@/lib/utils/geometry";
+import { usePlayerStore } from "@/lib/stores/usePlayerStore";
+import { usePauseStore } from "@/lib/stores/usePauseStore";
 
 const WALK_SPEED = 1.3; // deliberately slower than the player — reads as a casual stroll
 const ROTATION_SPEED = 3.2;
 const WAYPOINT_EPSILON = 0.15;
 const MIN_PAUSE = 1;
 const MAX_PAUSE = 3.5;
+// NPCs have no awareness of the player otherwise — without this, a patrol route
+// that happens to cross the player's position walks straight into them, shoving
+// them against whatever's behind (a tree, a bench). That's what "character gets
+// stuck, legs still animate" actually was: not a movement bug, a collision fight.
+const YIELD_RADIUS = 2.0;
 
 // Matches the player's own capsule resting height (0.55 half-height + 0.35 radius)
 // so NPCs stand at a consistent, correct height and collide at the right level.
 const RESTING_HEIGHT = 0.9;
+
+function isYieldingToPlayer(pos: { x: number; z: number }): boolean {
+  const [px, , pz] = usePlayerStore.getState().position;
+  const dx = px - pos.x;
+  const dz = pz - pos.z;
+  return dx * dx + dz * dz < YIELD_RADIUS * YIELD_RADIUS;
+}
 
 export default function NPCWalker({
   route,
@@ -41,10 +55,14 @@ export default function NPCWalker({
   useFrame((_, rawDelta) => {
     const body = rigidBody.current;
     if (!body) return;
+    if (usePauseStore.getState().paused) return;
     const delta = Math.min(rawDelta, 1 / 30);
 
     if (waitTimer.current > 0) {
       waitTimer.current -= delta;
+      if (animState !== "idle") setAnimState("idle");
+    } else if (isYieldingToPlayer(pos.current)) {
+      // Freeze rather than push through — see YIELD_RADIUS comment above.
       if (animState !== "idle") setAnimState("idle");
     } else {
       const target = route.waypoints[targetIndex.current];

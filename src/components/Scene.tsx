@@ -29,9 +29,11 @@ import PropField from "@/components/world/props/PropField";
 import Pond from "@/components/world/water/Pond";
 import NPCField from "@/components/npc/NPCField";
 import InteractionManager from "@/components/interaction/InteractionManager";
+import PostProcessing from "@/components/effects/PostProcessing";
 import { useKeyboardControls } from "@/lib/hooks/useKeyboardControls";
 import { useInteractionInput } from "@/lib/hooks/useInteractionInput";
 import { useCameraModeInput } from "@/lib/hooks/useCameraModeInput";
+import { usePauseInput } from "@/lib/hooks/usePauseInput";
 import { useSettingsStore } from "@/lib/stores/useSettingsStore";
 import { GRAPHICS_PRESETS } from "@/lib/constants/world";
 
@@ -84,6 +86,7 @@ function SceneContents() {
       <InteractionManager />
       <CameraRig />
       <CinematicIntro />
+      <PostProcessing />
     </>
   );
 }
@@ -92,6 +95,7 @@ export default function Scene() {
   useKeyboardControls();
   useInteractionInput();
   useCameraModeInput();
+  usePauseInput();
   const preset = useSettingsStore((s) => s.graphicsPreset);
   const resolved = preset === "auto" ? "medium" : preset;
   const { shadows, dpr } = GRAPHICS_PRESETS[resolved];

@@ -1,11 +1,13 @@
 "use client";
 
 import { useMemo, useRef, useEffect } from "react";
+import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { RigidBody, CylinderCollider } from "@react-three/rapier";
 import { mulberry32 } from "@/lib/utils/geometry";
 import { WORLD_BOUNDARY_RADIUS } from "@/lib/constants/world";
 import { isSceneryExcluded } from "@/lib/world/scenery";
+import { applyWindSway } from "@/lib/materials/windSway";
 
 const TREE_COUNT = 150;
 const SEED = 42;
@@ -142,12 +144,27 @@ function OakFoliage({ trees }: { trees: TreeInstance[] }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [trees]);
 
+  const windMaterials = useMemo(
+    () =>
+      colors.map((color) => {
+        const mat = new THREE.MeshStandardMaterial({ color, roughness: 0.9, flatShading: true });
+        return { mat, uniforms: applyWindSway(mat, { strength: 0.16, speed: 1.3 }) };
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+  useFrame((state) => {
+    windMaterials.forEach(({ uniforms }) => {
+      uniforms.uTime.value = state.clock.elapsedTime;
+    });
+  });
+
   return (
     <>
       {colors.map((color, i) => (
         <instancedMesh key={color} ref={refs[i]} args={[undefined, undefined, trees.length || 1]} castShadow frustumCulled={false}>
           <icosahedronGeometry args={[0.9, 1]} />
-          <meshStandardMaterial color={color} roughness={0.9} flatShading />
+          <primitive object={windMaterials[i].mat} attach="material" />
         </instancedMesh>
       ))}
     </>
@@ -166,6 +183,14 @@ function PineFoliage({ trees }: { trees: TreeInstance[] }) {
   const ref2 = useRef<THREE.InstancedMesh>(null);
   const refs = [ref0, ref1, ref2];
   const color = "#2f5f3a";
+  const { mat: windMaterial, uniforms } = useMemo(() => {
+    const m = new THREE.MeshStandardMaterial({ color, roughness: 0.85 });
+    return { mat: m, uniforms: applyWindSway(m, { strength: 0.13, speed: 1.3 }) };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  useFrame((state) => {
+    uniforms.uTime.value = state.clock.elapsedTime;
+  });
 
   useEffect(() => {
     const dummy = new THREE.Object3D();
@@ -191,7 +216,7 @@ function PineFoliage({ trees }: { trees: TreeInstance[] }) {
       {tiers.map((tier, i) => (
         <instancedMesh key={i} ref={refs[i]} args={[undefined, undefined, trees.length || 1]} castShadow frustumCulled={false}>
           <coneGeometry args={[tier.radius, tier.height, 7]} />
-          <meshStandardMaterial color={color} roughness={0.85} />
+          <primitive object={windMaterial} attach="material" />
         </instancedMesh>
       ))}
     </>
@@ -203,6 +228,15 @@ function BlossomFoliage({ trees }: { trees: TreeInstance[] }) {
   const canopyRef = useRef<THREE.InstancedMesh>(null);
   const blossomRef = useRef<THREE.InstancedMesh>(null);
   const BLOSSOMS_PER_TREE = 5;
+
+  const { mat: canopyMaterial, uniforms: canopyUniforms } = useMemo(() => {
+    const m = new THREE.MeshStandardMaterial({ color: "#c9d98a", roughness: 0.9, flatShading: true });
+    return { mat: m, uniforms: applyWindSway(m, { strength: 0.16, speed: 1.3 }) };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  useFrame((state) => {
+    canopyUniforms.uTime.value = state.clock.elapsedTime;
+  });
 
   const blossomOffsets = useMemo(() => {
     const rand = mulberry32(SEED + 1);
@@ -246,7 +280,7 @@ function BlossomFoliage({ trees }: { trees: TreeInstance[] }) {
     <>
       <instancedMesh ref={canopyRef} args={[undefined, undefined, trees.length || 1]} castShadow frustumCulled={false}>
         <icosahedronGeometry args={[0.85, 1]} />
-        <meshStandardMaterial color="#c9d98a" roughness={0.9} flatShading />
+        <primitive object={canopyMaterial} attach="material" />
       </instancedMesh>
       <instancedMesh ref={blossomRef} args={[undefined, undefined, blossomOffsets.length || 1]} frustumCulled={false}>
         <sphereGeometry args={[0.14, 6, 6]} />

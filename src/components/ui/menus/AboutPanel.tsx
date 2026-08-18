@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
+import { motion } from "framer-motion";
 import { useInteractionStore } from "@/lib/stores/useInteractionStore";
 import { ABOUT } from "@/content/about";
 import { playUiTone } from "@/lib/audio/uiSound";
+import { backdropMotion, cardMotion } from "./panelMotion";
 
 type Tab = "profile" | "timeline" | "values";
 
@@ -34,11 +36,13 @@ export default function AboutPanel() {
   };
 
   return (
-    <div
+    <motion.div
+      {...backdropMotion}
       className="fixed inset-0 z-40 flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm"
       onClick={handleClose}
     >
-      <div
+      <motion.div
+        {...cardMotion}
         className="flex h-[75vh] max-h-[620px] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#12181f] text-white shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
@@ -142,8 +146,8 @@ export default function AboutPanel() {
             Download Résumé
           </a>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 

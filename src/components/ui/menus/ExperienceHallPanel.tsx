@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
+import { motion } from "framer-motion";
 import { useInteractionStore } from "@/lib/stores/useInteractionStore";
 import { ACHIEVEMENTS, TECHNICAL_EXPERIENCE } from "@/content/experience";
 import { playUiTone } from "@/lib/audio/uiSound";
+import { backdropMotion, cardMotion } from "./panelMotion";
 
 type Tab = "achievements" | "technical";
 
@@ -28,11 +30,13 @@ export default function ExperienceHallPanel() {
   };
 
   return (
-    <div
+    <motion.div
+      {...backdropMotion}
       className="fixed inset-0 z-40 flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm"
       onClick={handleClose}
     >
-      <div
+      <motion.div
+        {...cardMotion}
         className="flex h-[75vh] max-h-[620px] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#12181f] text-white shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
@@ -98,8 +102,8 @@ export default function ExperienceHallPanel() {
             </div>
           )}
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 

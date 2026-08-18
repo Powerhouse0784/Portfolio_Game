@@ -44,7 +44,7 @@ export default function CentralPlaza() {
           </mesh>
           <mesh castShadow position={[0, 3.1, 0]}>
             <torusGeometry args={[0.65, 0.1, 12, 32]} />
-            <meshStandardMaterial color="#FFB800" metalness={0.6} roughness={0.3} />
+            <meshStandardMaterial color="#FFB800" metalness={0.6} roughness={0.3} emissive="#FFB800" emissiveIntensity={0.5} />
           </mesh>
           <mesh castShadow position={[0, 3.9, 0]}>
             <coneGeometry args={[0.35, 0.9, 8]} />

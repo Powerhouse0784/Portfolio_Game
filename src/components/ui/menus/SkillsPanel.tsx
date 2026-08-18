@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useInteractionStore } from "@/lib/stores/useInteractionStore";
 import { SKILLS, CATEGORY_ORDER, CATEGORY_COLORS, CATEGORY_BY_SLUG, type SkillCategory } from "@/content/skills";
 import { playUiTone } from "@/lib/audio/uiSound";
+import { backdropMotion, cardMotion } from "./panelMotion";
 
 const LEVEL_PIPS: Record<string, number> = { Familiar: 1, Proficient: 2, Advanced: 3 };
 
@@ -33,11 +35,13 @@ export default function SkillsPanel() {
   };
 
   return (
-    <div
+    <motion.div
+      {...backdropMotion}
       className="fixed inset-0 z-40 flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm"
       onClick={handleClose}
     >
-      <div
+      <motion.div
+        {...cardMotion}
         className="flex h-[75vh] max-h-[600px] w-full max-w-3xl overflow-hidden rounded-2xl border border-white/10 bg-[#12181f] text-white shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
@@ -93,28 +97,43 @@ export default function SkillsPanel() {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-              {skills.map((skill) => (
-                <div key={skill.id} className="rounded-lg border border-white/10 bg-white/5 p-3">
-                  <div className="mb-1 flex items-center justify-between gap-2">
-                    <span className="text-sm font-medium text-white/90">{skill.name}</span>
-                    <span className="flex shrink-0 gap-0.5">
-                      {[0, 1, 2].map((p) => (
-                        <span
-                          key={p}
-                          className="h-1.5 w-1.5 rounded-full"
-                          style={{ background: p < LEVEL_PIPS[skill.level] ? accent : "rgba(255,255,255,0.15)" }}
-                        />
-                      ))}
-                    </span>
-                  </div>
-                  {skill.note && <p className="text-xs text-white/50">{skill.note}</p>}
-                </div>
-              ))}
-            </div>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={selectedCategory}
+                className="grid grid-cols-1 gap-2.5 sm:grid-cols-2"
+                initial="hidden"
+                animate="show"
+                variants={{ show: { transition: { staggerChildren: 0.035 } } }}
+              >
+                {skills.map((skill) => (
+                  <motion.div
+                    key={skill.id}
+                    variants={{
+                      hidden: { opacity: 0, y: 8 },
+                      show: { opacity: 1, y: 0 },
+                    }}
+                    className="rounded-lg border border-white/10 bg-white/5 p-3"
+                  >
+                    <div className="mb-1 flex items-center justify-between gap-2">
+                      <span className="text-sm font-medium text-white/90">{skill.name}</span>
+                      <span className="flex shrink-0 gap-0.5">
+                        {[0, 1, 2].map((p) => (
+                          <span
+                            key={p}
+                            className="h-1.5 w-1.5 rounded-full"
+                            style={{ background: p < LEVEL_PIPS[skill.level] ? accent : "rgba(255,255,255,0.15)" }}
+                          />
+                        ))}
+                      </span>
+                    </div>
+                    {skill.note && <p className="text-xs text-white/50">{skill.note}</p>}
+                  </motion.div>
+                ))}
+              </motion.div>
+            </AnimatePresence>
           </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

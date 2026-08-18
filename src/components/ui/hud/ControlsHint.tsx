@@ -13,7 +13,7 @@ const DESKTOP_CONTROLS = [
   { keys: "V", action: "Toggle first-person view" },
   { keys: "E / Enter", action: "Interact" },
   { keys: "F", action: "Fullscreen" },
-  { keys: "Esc", action: "Close panel" },
+  { keys: "Esc", action: "Close panel / Pause" },
 ];
 
 const TOUCH_CONTROLS = [

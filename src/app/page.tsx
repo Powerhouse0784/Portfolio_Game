@@ -8,7 +8,10 @@ import TouchControls from "@/components/ui/hud/TouchControls";
 import OrientationWarning from "@/components/ui/hud/OrientationWarning";
 import FullscreenButton from "@/components/ui/hud/FullscreenButton";
 import ControlsHint from "@/components/ui/hud/ControlsHint";
+import PauseButton from "@/components/ui/hud/PauseButton";
+import Minimap from "@/components/ui/hud/Minimap";
 import ActivePanel from "@/components/ui/menus/ActivePanel";
+import PauseMenu from "@/components/ui/menus/PauseMenu";
 
 // Canvas/Three.js touches `window` — must be client-only, never SSR'd.
 const Scene = dynamic(() => import("@/components/Scene"), {
@@ -32,6 +35,9 @@ export default function Home() {
       <OrientationWarning />
       <FullscreenButton />
       <ControlsHint />
+      <PauseButton />
+      <Minimap />
+      <PauseMenu />
     </main>
   );
 }

@@ -6,6 +6,7 @@ import { RigidBody, useRapier, CapsuleCollider, RapierRigidBody } from "@react-t
 import * as THREE from "three";
 import { usePlayerStore } from "@/lib/stores/usePlayerStore";
 import { useIntroStore } from "@/lib/stores/useIntroStore";
+import { usePauseStore } from "@/lib/stores/usePauseStore";
 import PlayerCharacter from "./PlayerCharacter";
 import { wrapAngle } from "@/lib/utils/geometry";
 
@@ -34,6 +35,7 @@ export default function CharacterController() {
   const verticalVelocity = useRef(0);
   const currentRotationY = useRef(usePlayerStore.getState().rotationY);
   const characterController = useRef<ReturnType<typeof world.createCharacterController> | null>(null);
+  const lastHandledResetId = useRef(usePlayerStore.getState().resetRequestId);
 
   // Reusable scratch objects (avoid per-frame allocation)
   const forwardVec = useRef(new THREE.Vector3());
@@ -41,7 +43,11 @@ export default function CharacterController() {
 
   useEffect(() => {
     // offset = max gap the controller maintains from obstacles, prevents jitter
-    const controller = world.createCharacterController(0.02);
+    // offset = collision skin margin. Raised from 0.02 — too tight a margin makes
+    // the controller prone to catching/snagging when multiple nearby colliders
+    // (dense trees, an NPC, a bench) all contact at once, which reads as the
+    // character getting stuck even though input is still being applied every frame.
+    const controller = world.createCharacterController(0.04);
     controller.enableAutostep(0.4, 0.2, true); // climb small curbs/steps
     controller.enableSnapToGround(0.4); // stick to ground on slopes/small drops
     controller.setMaxSlopeClimbAngle((55 * Math.PI) / 180);
@@ -62,6 +68,18 @@ export default function CharacterController() {
     // processing, no gravity step. Spawn is already resting flush on the ground,
     // so simply not updating is enough; movement resumes the instant it ends.
     if (useIntroStore.getState().active) return;
+
+    // Same freeze while paused — but still check for a reset request first, so
+    // "Reset Position" in the pause menu works even while frozen.
+    const { resetRequestId } = usePlayerStore.getState();
+    if (resetRequestId !== lastHandledResetId.current) {
+      lastHandledResetId.current = resetRequestId;
+      body.setTranslation({ x: SPAWN_POSITION[0], y: SPAWN_POSITION[1], z: SPAWN_POSITION[2] }, true);
+      verticalVelocity.current = 0;
+      currentRotationY.current = Math.PI;
+    }
+
+    if (usePauseStore.getState().paused) return;
 
     // Clamp delta so a stalled tab doesn't launch the character across the map
     const delta = Math.min(rawDelta, 1 / 30);

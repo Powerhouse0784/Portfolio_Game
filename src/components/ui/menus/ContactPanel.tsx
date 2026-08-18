@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import type { FormEvent } from "react";
+import { motion } from "framer-motion";
 import { useInteractionStore } from "@/lib/stores/useInteractionStore";
 import { ABOUT } from "@/content/about";
 import { playUiTone } from "@/lib/audio/uiSound";
+import { backdropMotion, cardMotion } from "./panelMotion";
 
 type Status = "idle" | "submitting" | "success" | "error";
 
@@ -52,11 +54,13 @@ export default function ContactPanel() {
   };
 
   return (
-    <div
+    <motion.div
+      {...backdropMotion}
       className="fixed inset-0 z-40 flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm"
       onClick={handleClose}
     >
-      <div
+      <motion.div
+        {...cardMotion}
         className="flex max-h-[85vh] w-full max-w-md flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#12181f] text-white shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
@@ -149,8 +153,8 @@ export default function ContactPanel() {
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { AnimatePresence } from "framer-motion";
 import { useInteractionStore } from "@/lib/stores/useInteractionStore";
 import ZoneInfoPanel from "./ZoneInfoPanel";
 import ProjectsPanel from "./ProjectsPanel";
@@ -8,23 +9,35 @@ import AboutPanel from "./AboutPanel";
 import ExperienceHallPanel from "./ExperienceHallPanel";
 import ContactPanel from "./ContactPanel";
 
+type PanelKind = "none" | "projects" | "skills" | "about" | "experience" | "contact" | "zone";
+
+function resolveKind(id: string | null): PanelKind {
+  if (!id) return "none";
+  if (id === "projects" || id.startsWith("project:")) return "projects";
+  if (id === "skills" || id.startsWith("skill-category:")) return "skills";
+  if (id === "about" || id.startsWith("about-tab:")) return "about";
+  if (id === "experience" || id.startsWith("experience-tab:")) return "experience";
+  if (id === "contact") return "contact";
+  return "zone";
+}
+
+// AnimatePresence needs the panel to actually unmount (not just internally return
+// null) to detect the transition and play each panel's exit animation — mounting
+// exactly one keyed child based on `kind` is what makes that work correctly, and
+// switching between sub-ids of the *same* kind (e.g. "project:x" -> "project:y")
+// deliberately does NOT remount, since that's each panel's own internal tab logic.
 export default function ActivePanel() {
   const activePanelId = useInteractionStore((s) => s.activePanelId);
-  if (!activePanelId) return null;
+  const kind = resolveKind(activePanelId);
 
-  const isProjectRelated = activePanelId === "projects" || activePanelId.startsWith("project:");
-  if (isProjectRelated) return <ProjectsPanel />;
-
-  const isSkillRelated = activePanelId === "skills" || activePanelId.startsWith("skill-category:");
-  if (isSkillRelated) return <SkillsPanel />;
-
-  const isAboutRelated = activePanelId === "about" || activePanelId.startsWith("about-tab:");
-  if (isAboutRelated) return <AboutPanel />;
-
-  const isExperienceRelated = activePanelId === "experience" || activePanelId.startsWith("experience-tab:");
-  if (isExperienceRelated) return <ExperienceHallPanel />;
-
-  if (activePanelId === "contact") return <ContactPanel />;
-
-  return <ZoneInfoPanel />;
+  return (
+    <AnimatePresence mode="wait">
+      {kind === "projects" && <ProjectsPanel key="projects" />}
+      {kind === "skills" && <SkillsPanel key="skills" />}
+      {kind === "about" && <AboutPanel key="about" />}
+      {kind === "experience" && <ExperienceHallPanel key="experience" />}
+      {kind === "contact" && <ContactPanel key="contact" />}
+      {kind === "zone" && <ZoneInfoPanel key="zone" />}
+    </AnimatePresence>
+  );
 }

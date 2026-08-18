@@ -1,7 +1,9 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { useInteractionStore } from "@/lib/stores/useInteractionStore";
 import { playUiTone } from "@/lib/audio/uiSound";
+import { backdropMotion, cardMotion } from "./panelMotion";
 
 export default function ZoneInfoPanel() {
   const activePanelId = useInteractionStore((s) => s.activePanelId);
@@ -18,11 +20,13 @@ export default function ZoneInfoPanel() {
   };
 
   return (
-    <div
+    <motion.div
+      {...backdropMotion}
       className="fixed inset-0 z-40 flex items-center justify-center bg-black/50 px-4 backdrop-blur-sm"
       onClick={handleClose}
     >
-      <div
+      <motion.div
+        {...cardMotion}
         className="w-full max-w-md rounded-2xl border border-white/10 bg-[#12181f] p-6 text-white shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
@@ -41,7 +45,7 @@ export default function ZoneInfoPanel() {
           Full content for this zone arrives in the Portfolio Content phase — this is the interaction
           plumbing, wired and ready.
         </p>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
