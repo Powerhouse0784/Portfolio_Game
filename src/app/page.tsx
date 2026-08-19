@@ -10,6 +10,7 @@ import FullscreenButton from "@/components/ui/hud/FullscreenButton";
 import ControlsHint from "@/components/ui/hud/ControlsHint";
 import PauseButton from "@/components/ui/hud/PauseButton";
 import Minimap from "@/components/ui/hud/Minimap";
+import StartGate from "@/components/ui/hud/StartGate";
 import ActivePanel from "@/components/ui/menus/ActivePanel";
 import PauseMenu from "@/components/ui/menus/PauseMenu";
 
@@ -38,6 +39,7 @@ export default function Home() {
       <PauseButton />
       <Minimap />
       <PauseMenu />
+      <StartGate />
     </main>
   );
 }

@@ -19,7 +19,7 @@ export default function PauseButton() {
         playUiTone("open");
       }}
       aria-label="Pause"
-      title="Pause (Esc)"
+      title="Pause (P)"
       className="pointer-events-auto fixed right-4 top-28 z-30 flex h-10 w-10 items-center justify-center rounded-lg border border-white/15 bg-black/50 text-white backdrop-blur transition-colors hover:bg-black/70"
     >
       <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">

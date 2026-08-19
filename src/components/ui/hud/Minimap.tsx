@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePlayerStore } from "@/lib/stores/usePlayerStore";
 import { ZONES, ZONE_RING_RADIUS, PLAZA_RADIUS, angleToPosition } from "@/lib/constants/zones";
@@ -45,7 +45,11 @@ function MapContent({ sizePx, showLabels }: { sizePx: number; showLabels: boolea
 
       <circle cx={0} cy={0} r={showLabels ? 4 : 2.5} fill="#FFB800" />
 
-      <g transform={`translate(${player.x}, ${player.y}) rotate(${(rotationY * 180) / Math.PI})`}>
+      {/* SVG rotate() is clockwise-positive, and world "forward" = (sin r, cos r)
+          maps directly onto screen (x, y) since we don't invert the Y axis — the
+          angle that correctly points the (default: pointing-up) arrow along that
+          direction works out to 180° - rotationY, not rotationY itself. */}
+      <g transform={`translate(${player.x}, ${player.y}) rotate(${180 - (rotationY * 180) / Math.PI})`}>
         <path d="M 0 -7 L 5 6 L 0 3 L -5 6 Z" fill="#38BDF8" stroke="#0d1b12" strokeWidth={0.6} />
       </g>
     </svg>
@@ -54,6 +58,17 @@ function MapContent({ sizePx, showLabels }: { sizePx: number; showLabels: boolea
 
 export default function Minimap() {
   const [expanded, setExpanded] = useState(false);
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.repeat || e.code !== "KeyM") return;
+      const target = e.target as HTMLElement | null;
+      if (target && ["INPUT", "TEXTAREA"].includes(target.tagName)) return;
+      setExpanded((v) => !v);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
 
   return (
     <>

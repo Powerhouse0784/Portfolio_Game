@@ -13,7 +13,9 @@ const DESKTOP_CONTROLS = [
   { keys: "V", action: "Toggle first-person view" },
   { keys: "E / Enter", action: "Interact" },
   { keys: "F", action: "Fullscreen" },
-  { keys: "Esc", action: "Close panel / Pause" },
+  { keys: "M", action: "Toggle full map" },
+  { keys: "P", action: "Pause" },
+  { keys: "Esc", action: "Close panel / Resume" },
 ];
 
 const TOUCH_CONTROLS = [
@@ -62,7 +64,7 @@ export default function ControlsHint() {
 
       {open && (
         <div
-          className="pointer-events-auto fixed right-4 top-28 z-30 w-64 rounded-xl border border-white/15 bg-black/75 p-4 text-white shadow-xl backdrop-blur"
+          className="pointer-events-auto fixed right-4 top-40 z-30 w-64 rounded-xl border border-white/15 bg-black/75 p-4 text-white shadow-xl backdrop-blur"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="mb-2 flex items-center justify-between">

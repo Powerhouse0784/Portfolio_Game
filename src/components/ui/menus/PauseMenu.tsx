@@ -61,7 +61,7 @@ export default function PauseMenu() {
               </button>
             </div>
 
-            <p className="mt-5 text-center text-xs text-white/40">Press Esc to resume</p>
+            <p className="mt-5 text-center text-xs text-white/40">Press P or Esc to resume</p>
           </motion.div>
         </motion.div>
       )}
