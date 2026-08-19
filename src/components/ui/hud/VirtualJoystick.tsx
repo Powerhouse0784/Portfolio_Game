@@ -100,7 +100,7 @@ export default function VirtualJoystick() {
       style={{ width: BASE_SIZE, height: BASE_SIZE, touchAction: "none" }}
     >
       <div
-        className="absolute left-1/2 top-1/2 h-14 w-14 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/30 bg-white/40 shadow-lg"
+        className="absolute left-1/2 top-1/2 h-14 w-14 rounded-full border border-white/30 bg-white/40 shadow-lg"
         style={{ transform: `translate(-50%, -50%) translate(${nubPos.x}px, ${nubPos.y}px)` }}
       />
     </div>

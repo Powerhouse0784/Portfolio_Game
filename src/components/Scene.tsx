@@ -45,16 +45,25 @@ function SceneContents() {
           external CDN at runtime, which is a live network dependency that can (and
           did) fail outright. Sky + the lights below already fully cover the scene. */}
 
-      <ambientLight intensity={0.5} />
+      {/* Sky-color bounce from above, ground-color bounce from below — a fully
+          procedural stand-in for the ambient reflections an HDRI would normally
+          add, with zero external asset fetch. */}
+      <hemisphereLight args={["#bfe0ff", "#4a7c3f", 0.55]} />
+
+      <ambientLight intensity={0.25} />
       <directionalLight
         castShadow
         position={[40, 50, 20]}
-        intensity={1.4}
+        intensity={1.35}
         shadow-mapSize={[2048, 2048]}
         shadow-camera-left={-60}
         shadow-camera-right={60}
         shadow-camera-top={60}
         shadow-camera-bottom={-60}
+        shadow-camera-near={1}
+        shadow-camera-far={150}
+        shadow-bias={-0.0005}
+        shadow-normalBias={0.02}
       />
 
       <Physics gravity={[0, -9.81, 0]}>

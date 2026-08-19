@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useIsTouchDevice } from "@/lib/hooks/useIsTouchDevice";
-import { useIntroStore } from "@/lib/stores/useIntroStore";
 
 const DESKTOP_CONTROLS = [
   { keys: "W A S D / Arrow Keys", action: "Move" },
@@ -27,28 +26,11 @@ const TOUCH_CONTROLS = [
   { keys: "Tap prompt", action: "Interact" },
 ];
 
+// Opens only on tap — no auto-show on gameplay start. This used to auto-open once
+// the intro finished, which meant it appeared without being asked for.
 export default function ControlsHint() {
   const isTouch = useIsTouchDevice();
   const [open, setOpen] = useState(false);
-  const [autoShown, setAutoShown] = useState(false);
-
-  // Auto-open once, right as gameplay actually starts (intro finished/skipped) —
-  // so it's seen without anyone having to go looking for a help button first.
-  useEffect(() => {
-    if (autoShown) return;
-    const unsub = useIntroStore.subscribe((state) => {
-      if (!state.active) {
-        setOpen(true);
-        setAutoShown(true);
-      }
-    });
-    // Cinematic intro might already be finished/skipped before this mounts.
-    if (!useIntroStore.getState().active) {
-      setOpen(true);
-      setAutoShown(true);
-    }
-    return unsub;
-  }, [autoShown]);
 
   const rows = isTouch ? TOUCH_CONTROLS : DESKTOP_CONTROLS;
 
@@ -64,7 +46,10 @@ export default function ControlsHint() {
 
       {open && (
         <div
-          className="pointer-events-auto fixed right-4 top-40 z-30 w-64 rounded-xl border border-white/15 bg-black/75 p-4 text-white shadow-xl backdrop-blur"
+          // Constrained + scrollable rather than a fixed top offset with unbounded
+          // height — on short viewports (landscape mobile especially) the old
+          // version could run off the bottom of the screen entirely.
+          className="pointer-events-auto fixed right-4 top-40 z-30 max-h-[calc(100vh-11rem)] w-64 overflow-y-auto rounded-xl border border-white/15 bg-black/75 p-4 text-white shadow-xl backdrop-blur"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="mb-2 flex items-center justify-between">
