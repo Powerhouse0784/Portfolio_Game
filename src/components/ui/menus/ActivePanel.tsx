@@ -8,8 +8,9 @@ import SkillsPanel from "./SkillsPanel";
 import AboutPanel from "./AboutPanel";
 import ExperienceHallPanel from "./ExperienceHallPanel";
 import ContactPanel from "./ContactPanel";
+import CafePanel from "./CafePanel";
 
-type PanelKind = "none" | "projects" | "skills" | "about" | "experience" | "contact" | "zone";
+type PanelKind = "none" | "projects" | "skills" | "about" | "experience" | "contact" | "cafe" | "zone";
 
 function resolveKind(id: string | null): PanelKind {
   if (!id) return "none";
@@ -18,6 +19,7 @@ function resolveKind(id: string | null): PanelKind {
   if (id === "about" || id.startsWith("about-tab:")) return "about";
   if (id === "experience" || id.startsWith("experience-tab:")) return "experience";
   if (id === "contact") return "contact";
+  if (id === "cafe") return "cafe";
   return "zone";
 }
 
@@ -37,6 +39,7 @@ export default function ActivePanel() {
       {kind === "about" && <AboutPanel key="about" />}
       {kind === "experience" && <ExperienceHallPanel key="experience" />}
       {kind === "contact" && <ContactPanel key="contact" />}
+      {kind === "cafe" && <CafePanel key="cafe" />}
       {kind === "zone" && <ZoneInfoPanel key="zone" />}
     </AnimatePresence>
   );

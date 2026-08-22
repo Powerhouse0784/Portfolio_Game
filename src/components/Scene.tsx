@@ -21,6 +21,7 @@ import SkillBedField from "@/components/world/zones/SkillBedField";
 import AboutBust from "@/components/world/zones/AboutBust";
 import ExperienceHall from "@/components/world/zones/ExperienceHall";
 import ContactKiosk from "@/components/world/zones/ContactKiosk";
+import CafeStand from "@/components/world/zones/CafeStand";
 import TreeField from "@/components/world/vegetation/TreeField";
 import BushField from "@/components/world/vegetation/BushField";
 import FlowerPatches from "@/components/world/vegetation/FlowerPatches";
@@ -80,6 +81,7 @@ function SceneContents() {
         <AboutBust />
         <ExperienceHall />
         <ContactKiosk />
+        <CafeStand />
         <NPCField />
         <CharacterController />
       </Physics>
@@ -113,7 +115,12 @@ export default function Scene() {
     <Canvas
       shadows={shadows}
       dpr={dpr as [number, number]}
-      camera={{ fov: 55, near: 0.1, far: 300, position: [0, 3, 14] }}
+      // Matches the cinematic intro's first keyframe exactly — CinematicIntro
+      // now holds the camera there from its very first frame regardless of
+      // whether the person has dismissed the start gate yet, but keeping this
+      // fallback aligned too means there's no possible flash of a mismatched,
+      // oddly-low angle before that takes over.
+      camera={{ fov: 55, near: 0.1, far: 300, position: [0, 45, 5] }}
       gl={{ antialias: true, powerPreference: "high-performance" }}
     >
       <Suspense fallback={null}>

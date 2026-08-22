@@ -6,11 +6,12 @@ import { useIsTouchDevice } from "@/lib/hooks/useIsTouchDevice";
 
 export default function SkipIntroButton() {
   const active = useIntroStore((s) => s.active);
+  const started = useIntroStore((s) => s.started);
   const finishIntro = useIntroStore((s) => s.finishIntro);
   const isTouch = useIsTouchDevice();
 
   useEffect(() => {
-    if (!active) return;
+    if (!active || !started) return;
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.code === "Space" || e.code === "Escape") {
         e.preventDefault();
@@ -19,9 +20,9 @@ export default function SkipIntroButton() {
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [active, finishIntro]);
+  }, [active, started, finishIntro]);
 
-  if (!active) return null;
+  if (!active || !started) return null;
 
   return (
     <div className="pointer-events-none fixed inset-x-0 bottom-8 z-30 flex justify-center">

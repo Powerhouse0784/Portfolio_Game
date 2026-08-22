@@ -23,7 +23,12 @@ function buildKeyframes(): Keyframe[] {
     { t: 0.65, position: [0, 9, 50], lookAt: [0, 1, 20] }, // approaching down the entrance path
     // Ends exactly where the normal third-person camera would already place itself,
     // so handoff to CameraRig is seamless with no visible jump.
-    { t: 1, position: [spawn[0], spawn[1] + 3, spawn[2] + 5.3], lookAt: [spawn[0], spawn[1] + 1.2, spawn[2]] },
+    // Ends at CameraRig's own default position, computed with the exact same
+    // spherical formula it uses (radius 5.5, phi 1.0, theta 0) rather than an
+    // approximated number — the mismatch between an eyeballed guess and the real
+    // formula was exactly why the camera looked slightly off-angle at handoff
+    // instead of framing the entrance dead-on.
+    { t: 1, position: [spawn[0], spawn[1] + 2.9717, spawn[2] + 4.6281], lookAt: [spawn[0], spawn[1] + 1.2, spawn[2]] },
   ];
 }
 
@@ -41,8 +46,18 @@ export default function CinematicIntro() {
   const outLook = useRef(new THREE.Vector3());
 
   useFrame((_, rawDelta) => {
-    const { active, finishIntro } = useIntroStore.getState();
+    const { active, started, finishIntro } = useIntroStore.getState();
     if (!active) return;
+
+    if (!started) {
+      // StartGate hasn't been dismissed yet — hold the camera exactly at the
+      // intro's first keyframe rather than doing nothing (which would leave it
+      // wherever Canvas's fallback camera prop put it, a mismatched flash the
+      // instant the gate is dismissed) or letting the clock tick unseen.
+      camera.position.set(...keyframes[0].position);
+      camera.lookAt(...keyframes[0].lookAt);
+      return;
+    }
 
     if (useSettingsStore.getState().reducedMotion) {
       finishIntro();
